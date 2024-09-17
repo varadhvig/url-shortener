@@ -45,11 +45,12 @@ def generate_short_code(cursor, length=7):
         if not result:
             return short_code
 
-# Delete the database file (optional feature)
+# Delete the database file (and clear cache)
 def delete_database():
     DB_PATH = 'url_shortener.db'
     if os.path.exists(DB_PATH):
         os.remove(DB_PATH)
+        st.cache_resource.clear()  # Clear the cache when deleting the database
         st.success("Database deleted successfully.")
     else:
         st.error("Database file not found.")
@@ -59,7 +60,7 @@ def main():
     conn, cursor = init_db()
 
     # Set the base URL to the deployed app's URL
-    BASE_URL = "https://url-shortener-from-vignesh.streamlit.app"  # Replace this with your actual deployed app URL
+    BASE_URL = "https://url-shortener-from-vignesh.streamlit.app/"  # Replace this with your actual deployed app URL
 
     # Check for short code in the query parameters
     query_params = st.experimental_get_query_params()  # You can replace this with st.query_params after 2024-04-11
@@ -72,11 +73,9 @@ def main():
 
         if result:
             original_url = result[0]
-            # Perform the client-side redirection using JavaScript
+            # Perform the client-side redirection using meta refresh
             st.components.v1.html(f"""
-                <script>
-                    window.location.href = "{original_url}";
-                </script>
+                <meta http-equiv="refresh" content="0; url={original_url}" />
             """, height=0)
             return  # End the execution after redirection
 
