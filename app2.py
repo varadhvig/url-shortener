@@ -44,36 +44,25 @@ def generate_short_code(cursor, length=7):
         if not result:
             return short_code
 
+# Generate 30 million unique hex codes
+def generate_hex_codes():
+    characters = '0123456789abcdef'
+    hex_codes = set()  # Use a set to avoid duplicates
+    while len(hex_codes) < 30000000:
+        hex_code = ''.join(random.choices(characters, k=7))
+        hex_codes.add(hex_code)
+    return list(hex_codes)
+
 # Main application logic
 def main():
     conn, cursor = init_db()
 
     # Set the base URL to the deployed app's URL
-    BASE_URL = "https://url-shortener-from-vignesh.streamlit.app/"  # Replace this with your actual deployed app URL
-
-    # Check for short code in the query parameters
-    query_params = st.experimental_get_query_params()
-    if 'c' in query_params:
-        short_code = query_params['c'][0]
-
-        # Redirect to the original URL based on the short code
-        cursor.execute('SELECT original_url FROM urls WHERE short_code = ?', (short_code,))
-        result = cursor.fetchone()
-
-        if result:
-            original_url = result[0]
-            st.write(f"Redirecting to {original_url}...")
-            # Perform the client-side redirection using JavaScript
-            st.components.v1.html(f"""
-                <script>
-                    window.location.href = "{original_url}";
-                </script>
-            """, height=0)
-            return  # End the execution after redirection
-
+    BASE_URL = "https://url-shortener-from-vignesh.streamlit.app/"  
+    
     # Centered menu with radio buttons instead of sidebar
     st.markdown("<h1 style='text-align: center;'>🔗 URL Shortener</h1>", unsafe_allow_html=True)
-
+    
     menu = st.radio(
         "",
         ["Home", "Retrieve", "Generate"],
@@ -81,7 +70,7 @@ def main():
         index=0,
         key="main_menu"
     )
-
+    
     # Home page: URL Shortener
     if menu == "Home":
         st.title("🔗 URL Shortener")
@@ -158,3 +147,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
