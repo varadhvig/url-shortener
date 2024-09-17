@@ -1,9 +1,9 @@
-# app.py
 import streamlit as st
 import validators
 import sqlite3
 from pathlib import Path
 import random
+import os
 
 # Constants
 TOTAL_COMBINATIONS = 16 ** 7  # 268,435,456
@@ -23,6 +23,7 @@ def init_db():
     db_exists = Path(DB_PATH).is_file()
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)  # Fix for SQLite threading issue
     cursor = conn.cursor()
+    cursor.execute('PRAGMA journal_mode=WAL')  # Enable WAL mode for concurrent access
     if not db_exists:
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS urls (
@@ -44,6 +45,15 @@ def generate_short_code(cursor, length=7):
         if not result:
             return short_code
 
+# Delete the database file (optional feature)
+def delete_database():
+    DB_PATH = 'url_shortener.db'
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+        st.success("Database deleted successfully.")
+    else:
+        st.error("Database file not found.")
+
 # Main application logic
 def main():
     conn, cursor = init_db()
@@ -52,11 +62,11 @@ def main():
     BASE_URL = "https://url-shortener-from-vignesh.streamlit.app/"  # Replace this with your actual deployed app URL
 
     # Check for short code in the query parameters
-    query_params = st.experimental_get_query_params()
+    query_params = st.experimental_get_query_params()  # You can replace this with st.query_params after 2024-04-11
     if 'c' in query_params:
         short_code = query_params['c'][0]
 
-        # Redirect to the original URL based on the short code
+        # Retrieve the original URL based on the short code
         cursor.execute('SELECT original_url FROM urls WHERE short_code = ?', (short_code,))
         result = cursor.fetchone()
 
@@ -76,7 +86,7 @@ def main():
 
     menu = st.radio(
         "",
-        ["Home", "Retrieve", "Generate"],
+        ["Home", "Retrieve", "Generate", "Delete Database"],
         horizontal=True,
         index=0,
         key="main_menu"
@@ -151,10 +161,19 @@ def main():
         st.title("⚙️ Generate 30 Million Hex Codes")
         if st.button("Generate Hex Codes"):
             st.info("Generating 30 million hex codes, this may take a while...")
-            hex_codes = generate_hex_codes()
+            hex_codes = set()  # Generate 30 million hex codes without storing them
+            while len(hex_codes) < 30000000:
+                hex_code = ''.join(random.choices('0123456789abcdef', k=7))
+                hex_codes.add(hex_code)
             st.success(f"Successfully generated 30 million unique hex codes.")
             st.write(f"Here are the first 10 generated codes:")
-            st.write(hex_codes[:10])
+            st.write(list(hex_codes)[:10])
+
+    # Delete Database page: Allow user to delete the database
+    elif menu == "Delete Database":
+        st.title("🗑️ Delete Database")
+        if st.button("Delete Database"):
+            delete_database()
 
 if __name__ == "__main__":
     main()
