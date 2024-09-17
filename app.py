@@ -59,7 +59,7 @@ def main():
     conn, cursor = init_db()
 
     # Set the base URL to the deployed app's URL
-    BASE_URL = "https://url-shortener-from-vignesh.streamlit.app/"  # Replace this with your actual deployed app URL
+    BASE_URL = "https://url-shortener-from-vignesh.streamlit.app"  # Replace this with your actual deployed app URL
 
     # Check for short code in the query parameters
     query_params = st.experimental_get_query_params()  # You can replace this with st.query_params after 2024-04-11
@@ -133,9 +133,6 @@ def main():
 
         \[
         16^7 = 268,435,456
-        16^6 = 167,77,216
-        16^5 = 1048576
-        16^4 = 65536 only !!!
         \]
 
         This means there are a total of **268,435,456** unique combinations of 7-character hexadecimal codes. This ensures that we can create millions of unique short codes while maintaining a high level of uniqueness.
