@@ -72,7 +72,6 @@ def main():
 
         if result:
             original_url = result[0]
-            st.write(f"Redirecting to {original_url}...")
             # Perform the client-side redirection using JavaScript
             st.components.v1.html(f"""
                 <script>
