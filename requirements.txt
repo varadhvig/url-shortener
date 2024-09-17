@@ -1,2 +1,2 @@
 validators
-sqlite3
+streamlit
