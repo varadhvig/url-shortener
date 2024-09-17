@@ -58,7 +58,7 @@ def main():
     conn, cursor = init_db()
 
     # Set the base URL to the deployed app's URL
-    BASE_URL = "https://your-app-name.streamlit.app"  # Replace this with your actual deployed app URL
+    BASE_URL = "https://url-shortener-from-vignesh.streamlit.app/"  # Replace this with your actual deployed app URL
     
     # Centered menu with radio buttons instead of sidebar
     st.markdown("<h1 style='text-align: center;'>🔗 URL Shortener</h1>", unsafe_allow_html=True)
